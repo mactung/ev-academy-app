@@ -22,16 +22,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const HomePage = () => {
     const classes = useStyles();
     const [username, setUsername] = useState<string>('');
-    useEffect(() => {
-        const nameLocal = localStorage.getItem('username');
-        if (nameLocal) {
-            setUsername(nameLocal);
-        }
-    }, []);
 
-    const saveUsername = () => {
-        localStorage.setItem('username', username);
-    };
+    const saveUsername = () => {};
 
     return (
         <Container className={classes.root} maxWidth="lg">

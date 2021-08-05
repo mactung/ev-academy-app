@@ -31,7 +31,7 @@ export const instance = (baseURL: string): AxiosInstance => {
     return axiosInstance;
 };
 
-export const apiAxios = instance('http://ev-academy.test/');
+export const apiAxios = instance(`${process.env.REACT_APP_API}`);
 
 export function setHeaders(params: { Authorization: string }): void {
     const newHeaders = {
