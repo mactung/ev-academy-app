@@ -22,12 +22,22 @@ const useStyles = makeStyles((theme: Theme) =>
 const HomePage = () => {
     const classes = useStyles();
     const [username, setUsername] = useState<string>('');
+    const [isLogin, setIsLogin] = useState<boolean>(false);
+    useEffect(() => {
+        const nameLocal = localStorage.getItem('username');
+        if (nameLocal) {
+            setUsername(nameLocal);
+        }
+    }, []);
 
-    const saveUsername = () => {};
+    const saveUsername = () => {
+        localStorage.setItem('username', username);
+        setIsLogin(true);
+    };
 
     return (
         <Container className={classes.root} maxWidth="lg">
-            {!username ? (
+            {!isLogin ? (
                 <NameInput username={username} setUsername={setUsername} />
             ) : (
                 <Typography>Welcome, {username}</Typography>
