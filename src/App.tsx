@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import HomePage from './pages/home';
 import TestsPage from './pages/testsPage';
 import Testpage from './pages/testPage';
+import { setHeaders } from './services/axios';
 
 const App: any = () => {
     return (

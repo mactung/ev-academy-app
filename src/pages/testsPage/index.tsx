@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid } from '@material-ui/core';
+import { Container, Grid, CircularProgress, useForkRef } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import TestItem from './components/TestItem';
 import { Switch, Route, useRouteMatch } from 'react-router-dom';
 import TestPage from '../testPage';
-import { apiAxios } from '../../store/axios';
+import { apiAxios } from '../../services/axios';
 import MainLayout from '../../layouts/Main';
+import { useAppDispatch } from '../../stores/hooks';
+import { getUserByAccessToken } from '../../services/service';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -26,13 +29,20 @@ const useStyles = makeStyles((theme: Theme) =>
 const TestsPage = () => {
     const classes = useStyles();
     const match = useRouteMatch();
+    const dispatch = useAppDispatch();
+
     const [tests, setTests] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [user, setUser] = useState<any>();
     useEffect(() => {
         apiAxios.get('api/test').then((res) => {
             if (res.data.status == 'successful') {
-                console.log(res.data.result);
+                setIsLoading(false);
                 setTests(res.data.result);
             }
+        });
+        getUserByAccessToken().then((data) => {
+            setUser(data);
         });
     }, []);
     return (
@@ -43,11 +53,15 @@ const TestsPage = () => {
                 </Route>
                 <Route path={match.path}>
                     <Container className={classes.root}>
-                        <Grid container spacing={3}>
-                            {tests.map((test, index) => (
-                                <TestItem test={test} key={index} />
-                            ))}
-                        </Grid>
+                        {isLoading ? (
+                            <CircularProgress />
+                        ) : (
+                            <Grid container spacing={3}>
+                                {tests.map((test, index) => (
+                                    <TestItem test={test} key={index} isLock={!!user || test.required_login} />
+                                ))}
+                            </Grid>
+                        )}
                     </Container>
                 </Route>
             </Switch>

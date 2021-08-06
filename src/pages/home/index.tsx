@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Button, Typography } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import NameInput from './components/NameInput';
+import LoginView from './components/LoginView';
 import { useEffect } from 'react';
+import { getUserByAccessToken } from '../../services/service';
+import { apiAxios } from '../../services/axios';
+import Cookies from 'universal-cookie';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -21,35 +25,36 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const HomePage = () => {
     const classes = useStyles();
-    const [username, setUsername] = useState<string>('');
-    const [isLogin, setIsLogin] = useState<boolean>(false);
+    const [user, setUser] = useState<any>();
+
     useEffect(() => {
-        const nameLocal = localStorage.getItem('username');
-        if (nameLocal) {
-            setUsername(nameLocal);
-        }
+        getUserByAccessToken().then((res) => {
+            setUser(res);
+        });
     }, []);
 
-    const saveUsername = () => {
-        localStorage.setItem('username', username);
-        setIsLogin(true);
+    const logoutHandle = () => {
+        apiAxios.post('api/auth/logout').then(() => {
+            const cookies = new Cookies();
+            cookies.remove('access_token');
+            setUser(null);
+        });
     };
 
     return (
         <Container className={classes.root} maxWidth="lg">
-            {!isLogin ? (
-                <NameInput username={username} setUsername={setUsername} />
+            {user ? (
+                <>
+                    <Typography variant="h6">Welcome, {user.name}</Typography>
+                    <Button variant="contained" color="primary" onClick={logoutHandle} className={classes.buttonNext}>
+                        Logout
+                    </Button>
+                </>
             ) : (
-                <Typography>Welcome, {username}</Typography>
+                <LoginView setUser={setUser} />
             )}
-            <Button
-                href="/tests"
-                variant="contained"
-                color="primary"
-                className={classes.buttonNext}
-                onClick={saveUsername}
-            >
-                Next
+            <Button href="/tests" variant="contained" color="primary" className={classes.buttonNext}>
+                {user ? 'Go to Test' : 'Free Test'}
             </Button>
         </Container>
     );

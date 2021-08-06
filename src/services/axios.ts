@@ -1,13 +1,18 @@
 import pickBy from 'lodash/pickBy';
 import axios, { AxiosInstance } from 'axios';
 import qs from 'qs';
+import Cookies from 'universal-cookie';
 
 export const instance = (baseURL: string): AxiosInstance => {
+    const cookies = new Cookies();
+
     const axiosInstance = axios.create({
         baseURL,
         paramsSerializer: (params) => qs.stringify(params),
         timeout: 20000,
-        headers: {},
+        headers: {
+            Authorization: 'Bearer ' + cookies.get('access_token') || '',
+        },
     });
 
     axiosInstance.interceptors.request.use(

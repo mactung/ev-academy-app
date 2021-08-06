@@ -5,5 +5,5 @@ echo "Building app"
 npm run build
 
 echo "Deploying files to server"
-rsync -avP build/ ev-academy@example.com:/var/www/ev-academy-app/
+rsync -avP build/ examhelp.org.uk:/var/www/ev-academy-client/
 echo "Deployment complete"

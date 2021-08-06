@@ -1,10 +1,11 @@
 import React from 'react';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 interface IProps {
     test: any;
+    isLock: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -22,19 +23,18 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
-const TestItem = ({ test }: IProps) => {
+const TestItem = ({ test, isLock }: IProps) => {
+    const history = useHistory();
     const classes = useStyles();
     const goToExam = () => {
-        console.log(111);
+        if (isLock) history.push(`/tests/${test.id}`);
     };
     return (
-        <Grid className={classes.root} item xs={12} sm={4} onClick={goToExam}>
-            <Link to={`/tests/${test.id}`}>
-                <Paper className={classes.paper}>
-                    <img className={classes.imageExam} src={test.image_url} title={test.name} />
-                    <Typography>{test.name}</Typography>
-                </Paper>
-            </Link>
+        <Grid className={classes.root} item xs={12} sm={3} onClick={goToExam}>
+            <Paper className={classes.paper}>
+                <img className={classes.imageExam} src={test.image_url} title={test.name} />
+                <Typography>{test.name}</Typography>
+            </Paper>
         </Grid>
     );
 };
