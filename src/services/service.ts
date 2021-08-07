@@ -4,7 +4,6 @@ export const getUserByAccessToken = async () => {
     return apiAxios
         .get('api/auth/user-profile')
         .then((res) => {
-            console.log(res.data);
             if (res.status === 200) {
                 return res.data;
             }
@@ -25,7 +24,15 @@ export const login = async (email: string, password: string) => {
         .then((res) => {
             if (res.status === 200) {
                 cookies.set('access_token', res.data.access_token, { path: '/' });
-                return res.data.user;
             }
-        });
+            return res;
+        })
+        .catch((error) => console.log(error));
+};
+
+export const logout = async () => {
+    return apiAxios.post('api/auth/logout').then(() => {
+        const cookies = new Cookies();
+        cookies.remove('access_token');
+    });
 };

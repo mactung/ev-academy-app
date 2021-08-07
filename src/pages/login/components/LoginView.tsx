@@ -11,9 +11,9 @@ import {
     OutlinedInput,
 } from '@material-ui/core';
 import { login } from '../../../services/service';
-import { useHistory } from 'react-router-dom';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { AxiosResponse } from 'axios';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -30,16 +30,16 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const LoginView = ({ setUser }: any) => {
+const LoginView = () => {
     const classes = useStyles();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
-    const history = useHistory();
     const loginHandle = () => {
-        login(email, password).then((data) => {
-            setUser(data);
-            history.push('/tests');
+        login(email, password).then((res: any) => {
+            if (res.status === 200) {
+                window.location.reload();
+            }
         });
     };
 

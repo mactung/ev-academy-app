@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Button, Typography } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import LoginView from './components/LoginView';
 import { useEffect } from 'react';
 import { getUserByAccessToken } from '../../services/service';
 import { apiAxios } from '../../services/axios';
@@ -28,8 +27,10 @@ const HomePage = () => {
     const [user, setUser] = useState<any>();
 
     useEffect(() => {
-        getUserByAccessToken().then((res) => {
-            setUser(res);
+        getUserByAccessToken().then((data) => {
+            if (data) {
+                setUser(data);
+            }
         });
     }, []);
 
@@ -51,7 +52,9 @@ const HomePage = () => {
                     </Button>
                 </>
             ) : (
-                <LoginView setUser={setUser} />
+                <Button href="/login" variant="contained" color="primary" className={classes.buttonNext}>
+                    Login
+                </Button>
             )}
             <Button href="/tests" variant="contained" color="primary" className={classes.buttonNext}>
                 {user ? 'Go to Test' : 'Free Test'}

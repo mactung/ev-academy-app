@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, AppBar, Toolbar, CircularProgress } from '@material-ui/core';
-import { useParams } from 'react-router-dom';
+import { Container, Typography, CircularProgress } from '@material-ui/core';
+import { useHistory, useParams } from 'react-router-dom';
 import { apiAxios } from '../../services/axios';
 import TaskItem from './components/TaskItem';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useAppSelector } from '../../stores/hooks';
+import { getUserByAccessToken } from '../../services/service';
+import AppBar from '../../components/AppBar';
 interface ParamTypes {
     testId: string;
 }
@@ -45,23 +46,15 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const TestPage = () => {
-    const { user } = useAppSelector((state) => state.storage);
-
     const [test, setTest] = useState<any>();
+    const [user, setUser] = useState<any>();
     const { testId } = useParams<ParamTypes>();
+    const history = useHistory();
     const classes = useStyles();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [answers, setAnswers] = useState<any>({});
     const [isFinish, setIsFinish] = useState<boolean>(false);
     const [scorce, setScorce] = useState<number>(0);
-    useEffect(() => {
-        apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
-            if (res.data.status == 'successful') {
-                setTest(res.data.result);
-                setIsLoading(false);
-            }
-        });
-    }, []);
 
     const checkAnswer = () => {
         Object.values(answers).forEach((answer: any) => {
@@ -72,8 +65,25 @@ const TestPage = () => {
         setIsFinish(true);
     };
 
+    useEffect(() => {
+        getUserByAccessToken().then((dataUser) => {
+            apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
+                if (res.data.status == 'successful') {
+                    if (!!dataUser || res.data.result.required_login) {
+                        setUser(dataUser);
+                        setTest(res.data.result);
+                        setIsLoading(false);
+                    } else {
+                        history.push('/');
+                    }
+                }
+            });
+        });
+    }, []);
+
     return (
         <>
+            <AppBar user={user} setUser={setUser} />
             {isLoading ? (
                 <div className={classes.loadingContainer}>
                     <CircularProgress />

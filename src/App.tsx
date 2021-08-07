@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import HomePage from './pages/home';
 import TestsPage from './pages/testsPage';
 import Testpage from './pages/testPage';
-import { setHeaders } from './services/axios';
+import LoginPage from './pages/login';
 
 const App: any = () => {
     return (
@@ -11,6 +11,9 @@ const App: any = () => {
             <Switch>
                 <Route path="/tests">
                     <TestsPage />
+                </Route>
+                <Route path="/login">
+                    <LoginPage />
                 </Route>
                 <Route path="/tests/:examId">
                     <Testpage />
