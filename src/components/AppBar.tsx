@@ -4,9 +4,10 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { logout } from '../services/service';
 import { useHistory, Link } from 'react-router-dom';
-interface ParamTypes {
-    testId: string;
-}
+import { useAppDispatch } from '../stores/hooks';
+import { removeUser } from '../stores/slices/storageSlice';
+
+interface ParamTypes {}
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,12 +30,12 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const Bar = ({ user, setUser }: any) => {
+const Bar = ({ user }: any) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const history = useHistory();
-
+    const dispatch = useAppDispatch();
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -45,7 +46,7 @@ const Bar = ({ user, setUser }: any) => {
 
     const logoutHandle = () => {
         logout().then(() => {
-            setUser(null);
+            dispatch(removeUser());
             history.push('/');
         });
     };
@@ -58,7 +59,7 @@ const Bar = ({ user, setUser }: any) => {
                         EV Academy
                     </Typography>
                 </Link>
-                {!!user && (
+                {user.isLogin && (
                     <div>
                         <IconButton
                             aria-label="account of current user"

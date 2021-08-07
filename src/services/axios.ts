@@ -5,7 +5,6 @@ import Cookies from 'universal-cookie';
 
 export const instance = (baseURL: string): AxiosInstance => {
     const cookies = new Cookies();
-
     const axiosInstance = axios.create({
         baseURL,
         paramsSerializer: (params) => qs.stringify(params),

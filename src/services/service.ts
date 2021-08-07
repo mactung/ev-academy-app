@@ -1,4 +1,4 @@
-import { apiAxios } from './axios';
+import { apiAxios, setHeaders } from './axios';
 import Cookies from 'universal-cookie';
 export const getUserByAccessToken = async () => {
     return apiAxios
@@ -24,6 +24,7 @@ export const login = async (email: string, password: string) => {
         .then((res) => {
             if (res.status === 200) {
                 cookies.set('access_token', res.data.access_token, { path: '/' });
+                setHeaders({ Authorization: 'Bearer ' + res.data.access_token });
             }
             return res;
         })
@@ -31,8 +32,22 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-    return apiAxios.post('api/auth/logout').then(() => {
-        const cookies = new Cookies();
-        cookies.remove('access_token');
-    });
+    const cookies = new Cookies();
+    if (!cookies.get('access_token')) {
+        return;
+    }
+    return apiAxios
+        .post(
+            'api/auth/logout',
+            {},
+            {
+                headers: {
+                    Authorization: 'Bearer ' + cookies.get('access_token'),
+                },
+            },
+        )
+        .then(() => {
+            const cookies = new Cookies();
+            cookies.remove('access_token');
+        });
 };

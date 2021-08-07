@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress } from '@material-ui/core';
+import { Container, Typography, CircularProgress, Fab } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 import { useHistory, useParams } from 'react-router-dom';
 import { apiAxios } from '../../services/axios';
 import TaskItem from './components/TaskItem';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { getUserByAccessToken } from '../../services/service';
-import AppBar from '../../components/AppBar';
+import { useAppSelector } from '../../stores/hooks';
 interface ParamTypes {
     testId: string;
 }
@@ -47,7 +48,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const TestPage = () => {
     const [test, setTest] = useState<any>();
-    const [user, setUser] = useState<any>();
     const { testId } = useParams<ParamTypes>();
     const history = useHistory();
     const classes = useStyles();
@@ -55,7 +55,7 @@ const TestPage = () => {
     const [answers, setAnswers] = useState<any>({});
     const [isFinish, setIsFinish] = useState<boolean>(false);
     const [scorce, setScorce] = useState<number>(0);
-
+    const { user } = useAppSelector((state) => state.storage);
     const checkAnswer = () => {
         Object.values(answers).forEach((answer: any) => {
             if (answer.is_correct == 1) {
@@ -70,7 +70,6 @@ const TestPage = () => {
             apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
                 if (res.data.status == 'successful') {
                     if (!!dataUser || !res.data.result.required_login) {
-                        setUser(dataUser);
                         setTest(res.data.result);
                         setIsLoading(false);
                     } else {
@@ -83,7 +82,6 @@ const TestPage = () => {
 
     return (
         <>
-            <AppBar user={user} setUser={setUser} />
             {isLoading ? (
                 <div className={classes.loadingContainer}>
                     <CircularProgress />

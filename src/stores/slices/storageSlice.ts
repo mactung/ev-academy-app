@@ -5,8 +5,9 @@ import type { RootState } from '../store';
 interface StorageState {
     user: {
         name: string;
+        email: string;
         id: number;
-        isLogged: boolean;
+        isLogin: boolean;
     };
 }
 
@@ -14,8 +15,9 @@ interface StorageState {
 const initialState: StorageState = {
     user: {
         name: '',
+        email: '',
         id: 0,
-        isLogged: false,
+        isLogin: false,
     },
 };
 
@@ -24,16 +26,17 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action: PayloadAction<any>) => {
-            console.log(action.payload);
+            state.user.email = action.payload.email;
             state.user.name = action.payload.name;
             state.user.id = action.payload.id;
-            state.user.isLogged = true;
+            state.user.isLogin = true;
         },
         removeUser: (state) => {
             state.user = {
                 name: '',
                 id: 0,
-                isLogged: false,
+                isLogin: false,
+                email: '',
             };
         },
     },

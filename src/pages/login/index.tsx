@@ -3,8 +3,8 @@ import { Container } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import LoginView from './components/LoginView';
 import { useEffect } from 'react';
-import { getUserByAccessToken } from '../../services/service';
 import { useHistory } from 'react-router';
+import { useAppSelector } from '../../stores/hooks';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -25,14 +25,13 @@ const useStyles = makeStyles((theme: Theme) =>
 const LoginPage = () => {
     const classes = useStyles();
     const history = useHistory();
-
+    const { user } = useAppSelector((state) => state.storage);
     useEffect(() => {
-        getUserByAccessToken().then((data) => {
-            if (data) {
-                history.push('/');
-            }
-        });
-    }, []);
+        console.log('pagelogin', user);
+        if (user.isLogin) {
+            history.push('/');
+        }
+    }, [user]);
 
     return (
         <Container className={classes.root} maxWidth="lg">

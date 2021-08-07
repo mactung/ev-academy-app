@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Container, Button, Typography } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { useEffect } from 'react';
-import { getUserByAccessToken } from '../../services/service';
-import { apiAxios } from '../../services/axios';
+import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { removeUser } from '../../stores/slices/storageSlice';
+import { logout } from '../../services/service';
 import Cookies from 'universal-cookie';
+import { setHeaders } from '../../services/axios';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,27 +26,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const HomePage = () => {
     const classes = useStyles();
-    const [user, setUser] = useState<any>();
-
-    useEffect(() => {
-        getUserByAccessToken().then((data) => {
-            if (data) {
-                setUser(data);
-            }
-        });
-    }, []);
+    const { user } = useAppSelector((state) => state.storage);
+    const dispatch = useAppDispatch();
+    useEffect(() => {}, []);
 
     const logoutHandle = () => {
-        apiAxios.post('api/auth/logout').then(() => {
-            const cookies = new Cookies();
-            cookies.remove('access_token');
-            setUser(null);
+        const cookies = new Cookies();
+        setHeaders({
+            Authorization: 'Bearer ' + cookies.get('access_token'),
+        });
+        logout().then(() => {
+            dispatch(removeUser());
         });
     };
 
     return (
         <Container className={classes.root} maxWidth="lg">
-            {user ? (
+            {user.isLogin ? (
                 <>
                     <Typography variant="h6">Welcome, {user.name}</Typography>
                     <Button variant="contained" color="primary" onClick={logoutHandle} className={classes.buttonNext}>
