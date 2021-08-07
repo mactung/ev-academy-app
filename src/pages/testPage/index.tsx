@@ -69,7 +69,7 @@ const TestPage = () => {
         getUserByAccessToken().then((dataUser) => {
             apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
                 if (res.data.status == 'successful') {
-                    if (!!dataUser || res.data.result.required_login) {
+                    if (!!dataUser || !res.data.result.required_login) {
                         setUser(dataUser);
                         setTest(res.data.result);
                         setIsLoading(false);

@@ -58,7 +58,7 @@ const TestsPage = () => {
                         ) : (
                             <Grid container spacing={3}>
                                 {tests.map((test, index) => (
-                                    <TestItem test={test} key={index} isLock={!!user || test.required_login} />
+                                    <TestItem test={test} key={index} isLock={!!user || !test.required_login} />
                                 ))}
                             </Grid>
                         )}
