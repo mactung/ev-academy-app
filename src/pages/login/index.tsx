@@ -28,7 +28,7 @@ const LoginPage = () => {
     const { user } = useAppSelector((state) => state.storage);
     useEffect(() => {
         if (user.isLogin) {
-            history.push('/');
+            history.goBack();
         }
     }, [user]);
 

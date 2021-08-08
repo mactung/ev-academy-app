@@ -7,7 +7,8 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 interface IProps {
     task: any;
     index: number;
-    setAnswers: (value: any) => void;
+    chooseAnswer: (questionId: number, answerId: number) => void;
+    answers: any;
 }
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
-const TaskItem = ({ task, index, setAnswers }: IProps) => {
+const TaskItem = ({ task, index, chooseAnswer, answers }: IProps) => {
     const classes = useStyles();
     return (
         <div>
@@ -33,7 +34,15 @@ const TaskItem = ({ task, index, setAnswers }: IProps) => {
             <div className={classes.question}>
                 {task.questions.map((q: any, index: number) => {
                     if (q.type === 'multiple') {
-                        return <MultipleItem question={q} key={index} index={index} setAnswers={setAnswers} />;
+                        return (
+                            <MultipleItem
+                                question={q}
+                                key={index}
+                                index={index}
+                                chooseAnswer={chooseAnswer}
+                                answers={answers}
+                            />
+                        );
                     } else if (q.type === 'fill') {
                         return <FillItem question={q} key={index} index={index} />;
                     } else if (q.type === 'rewrite') {

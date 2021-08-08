@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Typography, FormControl, RadioGroup, FormControlLabel, Radio } from '@material-ui/core';
+import { useEffect } from 'react';
 
 interface Iprops {
     index: number;
     question: any;
-    setAnswers: (value: any) => void;
+    chooseAnswer: (questionId: number, answerId: number) => void;
+    answers: any;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -20,16 +22,20 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const MultipleItem: any = ({ index, question, setAnswers }: Iprops) => {
+const MultipleItem: any = ({ index, question, chooseAnswer, answers }: Iprops) => {
     const classes = useStyles();
     const [value, setValue] = useState<string>('');
+
+    useEffect(() => {
+        if (answers[question.id]) {
+            setValue(String(answers[question.id].answer_id));
+        }
+    }, [answers]);
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, value: any) => {
         event.persist();
         setValue((event.target as HTMLInputElement).value);
-        setAnswers((state: any) => {
-            state[question.id] = question.answers.find((a: any) => a.id == (event.target as HTMLInputElement).value);
-            return state;
-        });
+        chooseAnswer(question.id, Number(value));
     };
     return (
         <div className={classes.root}>

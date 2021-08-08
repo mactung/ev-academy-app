@@ -56,17 +56,17 @@ const TestPage = () => {
     const { testId } = useParams<ParamTypes>();
     const history = useHistory();
     const classes = useStyles();
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [answers, setAnswers] = useState<any>({});
-    const [testStatus, setTestStatus] = useState<string>('start');
-    const [scorce, setScorce] = useState<number>(0);
+    const [testStatus, setTestStatus] = useState<string>('loading');
+    const [testPoint, setTestPoint] = useState<number>(0);
     const [username, setUsername] = useState<string>('');
+    const [result, setResult] = useState<any>();
 
     const { user } = useAppSelector((state) => state.storage);
     const checkAnswer = () => {
         Object.values(answers).forEach((answer: any) => {
             if (answer.is_correct == 1) {
-                setScorce((state) => (state += 1));
+                setTestPoint((state) => (state += 1));
             }
         });
         setTestStatus('finish');
@@ -77,53 +77,103 @@ const TestPage = () => {
             apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
                 if (res.data.status == 'successful') {
                     if (!!dataUser || !res.data.result.required_login) {
-                        setTest(res.data.result);
-                        setIsLoading(false);
+                        const testData = res.data.result;
+                        setTest(testData);
+                        apiAxios
+                            .get(`api/result?filters=user_id=${user.id},test_id=${testData.id}`)
+                            .then((response) => {
+                                if (response.data.status === 'successful') {
+                                    console.log(response.data.result[0]);
+                                    if (response.data.result.length > 0) {
+                                        const result = response.data.result[0];
+                                        setResult(result);
+                                        setAnswers(JSON.parse(result.meta_data));
+                                        if (result.is_done == 1) {
+                                            setTestStatus('finish');
+                                        } else {
+                                            setTestStatus('start');
+                                        }
+                                    } else {
+                                        setTestStatus('start');
+                                    }
+                                }
+                            });
                     } else {
-                        history.push('/');
+                        history.replace('/');
                     }
                 }
             });
         });
-    }, []);
+    }, [user]);
+
+    const chooseAnswer = (questionId: number, answerId: number) => {
+        setAnswers((state: any) => {
+            state[questionId] = { answer_id: answerId, question_id: questionId };
+            if (result.is_done !== 1) {
+                apiAxios.patch('api/result/' + result.id, {
+                    meta_data: JSON.stringify(state),
+                });
+            }
+            return state;
+        });
+    };
 
     const doTest = () => {
         if (username === '' && !user.isLogin) return;
         setTestStatus('doing');
+        if (!result && user.isLogin) {
+            apiAxios
+                .post('api/result', {
+                    user_id: user.id,
+                    test_id: test.id,
+                    meta_data: '{}',
+                })
+                .then((res) => {
+                    setResult(res.data.result);
+                });
+        }
     };
 
     return (
         <MainLayout>
             <AppBar user={user} />
-            {isLoading ? (
-                <div className={classes.loadingContainer}>
-                    <CircularProgress />
-                </div>
-            ) : (
-                <Container className={classes.root}>
-                    {testStatus === 'start' && (
-                        <Start username={username} setUsername={setUsername} user={user} doTest={doTest} />
-                    )}
-                    {testStatus === 'doing' && (
-                        <>
-                            <div className={classes.title}>
-                                <Typography variant="h3">{test?.name}</Typography>
-                            </div>
-                            <div>
-                                {test?.tasks?.map((task: any, index: number) => {
-                                    return <TaskItem key={index} task={task} index={index} setAnswers={setAnswers} />;
-                                })}
-                            </div>
-                        </>
-                    )}
-                    {testStatus === 'finish' && (
-                        <div className={classes.finishContainer}>
-                            <Typography variant="h4">Your scorce:</Typography>
-                            <Typography variant="h3">{scorce}</Typography>
+            <Container className={classes.root}>
+                {testStatus === 'loading' && (
+                    <div className={classes.loadingContainer}>
+                        <CircularProgress />
+                    </div>
+                )}
+                {testStatus === 'start' && (
+                    <Start username={username} setUsername={setUsername} user={user} doTest={doTest} />
+                )}
+                {testStatus === 'doing' && (
+                    <>
+                        <div className={classes.title}>
+                            <Typography variant="h3">{test?.name}</Typography>
                         </div>
-                    )}
-                </Container>
-            )}
+                        <div>
+                            {test?.tasks?.map((task: any, index: number) => {
+                                return (
+                                    <TaskItem
+                                        key={index}
+                                        task={task}
+                                        index={index}
+                                        chooseAnswer={chooseAnswer}
+                                        answers={answers}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
+                {testStatus === 'finish' && (
+                    <div className={classes.finishContainer}>
+                        <Typography variant="h4">Your scorce:</Typography>
+                        <Typography variant="h3">{testPoint}</Typography>
+                        <Button onClick={() => setTestStatus('start')}>Again</Button>
+                    </div>
+                )}
+            </Container>
         </MainLayout>
     );
 };

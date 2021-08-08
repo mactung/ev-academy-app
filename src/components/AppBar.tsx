@@ -3,7 +3,6 @@ import { Typography, AppBar, Toolbar, IconButton, Menu, MenuItem, Button, Link }
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { logout } from '../services/service';
-import { useHistory } from 'react-router-dom';
 import { useAppDispatch } from '../stores/hooks';
 import { removeUser } from '../stores/slices/storageSlice';
 interface ParamTypes {}
@@ -46,7 +45,6 @@ const Bar = ({ user }: any) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const history = useHistory();
     const dispatch = useAppDispatch();
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -60,7 +58,6 @@ const Bar = ({ user }: any) => {
     const logoutHandle = () => {
         logout().then(() => {
             dispatch(removeUser());
-            history.replace('/');
         });
     };
 

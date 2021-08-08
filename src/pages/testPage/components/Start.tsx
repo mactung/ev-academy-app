@@ -50,6 +50,9 @@ const Start = ({ username, setUsername, user, doTest }: IProps) => {
                     />
                 </form>
             )}
+            <div>
+                <Typography>Khi bắt đầu làm bài thời gian sẽ luôn được tính kể cả khi bạn thoát ra.</Typography>
+            </div>
             <Button className={classes.button} variant="contained" color="secondary" onClick={() => doTest()}>
                 Start
             </Button>
