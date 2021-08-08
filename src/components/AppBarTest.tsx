@@ -36,13 +36,10 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: 'row',
             alignItems: 'center',
         },
-        loginText: {
-            color: '#fff',
-        },
     }),
 );
 
-const Bar = ({ user }: any) => {
+const AppBarTest = ({ user }: any) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -62,6 +59,10 @@ const Bar = ({ user }: any) => {
             dispatch(removeUser());
             history.replace('/');
         });
+    };
+
+    const goToLogin = () => {
+        history.replace('/login');
     };
 
     return (
@@ -106,11 +107,7 @@ const Bar = ({ user }: any) => {
                     </div>
                 ) : (
                     <div>
-                        <Link href="/login">
-                            <Typography className={classes.loginText} variant="h6">
-                                Login
-                            </Typography>
-                        </Link>
+                        <Button onClick={goToLogin}>Login</Button>
                     </div>
                 )}
             </Toolbar>
@@ -118,4 +115,4 @@ const Bar = ({ user }: any) => {
     );
 };
 
-export default Bar;
+export default AppBarTest;

@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { store } from './stores/store';
 import { Provider } from 'react-redux';
+// import Helmet from 'react-helmet';
 
 ReactDOM.render(
     <React.StrictMode>
@@ -14,6 +15,7 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('root'),
 );
+// Helmet.renderStatic();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

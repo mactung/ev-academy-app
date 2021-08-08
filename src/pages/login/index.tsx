@@ -27,7 +27,6 @@ const LoginPage = () => {
     const history = useHistory();
     const { user } = useAppSelector((state) => state.storage);
     useEffect(() => {
-        console.log('pagelogin', user);
         if (user.isLogin) {
             history.push('/');
         }
