@@ -9,13 +9,14 @@ export const instance = (baseURL: string): AxiosInstance => {
         baseURL,
         paramsSerializer: (params) => qs.stringify(params),
         timeout: 20000,
-        headers: {
-            Authorization: 'Bearer ' + cookies.get('access_token') || '',
-        },
     });
 
     axiosInstance.interceptors.request.use(
         function (config) {
+            const token = cookies.get('access_token');
+            if (token) {
+                config.headers['Authorization'] = 'Bearer ' + token;
+            }
             return config;
         },
         function (error) {
