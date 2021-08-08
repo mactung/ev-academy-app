@@ -14,9 +14,9 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             display: 'flex',
             flexDirection: 'column',
-            height: '100%',
             justifyContent: 'center',
             alignItems: 'center',
+            height: '100vh',
         },
         form: {
             display: 'flex',
