@@ -1,13 +1,10 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Container, Grid, CircularProgress } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { removeUser } from '../../stores/slices/storageSlice';
-import { logout } from '../../services/service';
-import Cookies from 'universal-cookie';
-import { apiAxios, setHeaders } from '../../services/axios';
+import { apiAxios } from '../../services/axios';
 import AppBar from '../../components/AppBar';
-import TestItem from './components/TestItem';
+import CategoryItem from './components/CategoryItem';
+import { useAppSelector } from '../../stores/hooks';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,44 +26,30 @@ const useStyles = makeStyles((theme: Theme) =>
 const HomePage = () => {
     const classes = useStyles();
     const { user } = useAppSelector((state) => state.storage);
-    const dispatch = useAppDispatch();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [tests, setTests] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     useEffect(() => {
-        apiAxios.get('api/test').then((res) => {
+        apiAxios.get('api/category?filters=type=test&embeds=tests').then((res) => {
             if (res.data.status == 'successful') {
-                setIsLoading(false);
-                setTests(res.data.result);
+                setCategories(res.data.result);
             }
+            setIsLoading(false);
         });
     }, []);
-
-    const logoutHandle = () => {
-        const cookies = new Cookies();
-        setHeaders({
-            Authorization: 'Bearer ' + cookies.get('access_token'),
-        });
-        logout().then(() => {
-            dispatch(removeUser());
-        });
-    };
 
     return (
         <Fragment>
             <AppBar user={user} />
-
-            <Container className={classes.root}>
-                {isLoading ? (
-                    <CircularProgress />
-                ) : (
-                    <Grid container spacing={3}>
-                        {tests.map((test, index) => (
-                            <TestItem test={test} key={index} isLock={user.isLogin || !test.required_login} />
-                        ))}
-                    </Grid>
-                )}
-            </Container>
+            {isLoading ? (
+                <CircularProgress />
+            ) : (
+                <Container className={classes.root}>
+                    {categories.map((c) => (
+                        <CategoryItem key={c.id} category={c} user={user} />
+                    ))}
+                </Container>
+            )}
         </Fragment>
     );
 };

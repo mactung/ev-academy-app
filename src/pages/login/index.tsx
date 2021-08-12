@@ -8,6 +8,11 @@ import { useAppSelector } from '../../stores/hooks';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        wrapper: {
+            backgroundImage: 'url(https://picsum.photos/seed/picsum/1080/1920)',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+        },
         root: {
             width: '100%',
             height: '100vh',
@@ -28,14 +33,16 @@ const LoginPage = () => {
     const { user } = useAppSelector((state) => state.storage);
     useEffect(() => {
         if (user.isLogin) {
-            history.goBack();
+            history.push('/');
         }
     }, [user]);
 
     return (
-        <Container className={classes.root} maxWidth="lg">
-            <LoginView />
-        </Container>
+        <div className={classes.wrapper}>
+            <Container className={classes.root} maxWidth="lg">
+                <LoginView />
+            </Container>
+        </div>
     );
 };
 export default LoginPage;

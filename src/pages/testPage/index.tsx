@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress, Button } from '@material-ui/core';
+import { Container, Typography, CircularProgress, Button, Fab } from '@material-ui/core';
 import { useHistory, useParams } from 'react-router-dom';
 import { apiAxios } from '../../services/axios';
 import TaskItem from './components/TaskItem';
@@ -9,6 +9,7 @@ import { useAppSelector } from '../../stores/hooks';
 import MainLayout from '../../layouts/Main';
 import AppBar from '../../components/AppBar';
 import Start from './components/Start';
+import TestInfo from './components/TestInfo';
 // import  Helmet from 'react-helmet';
 
 interface ParamTypes {
@@ -59,16 +60,22 @@ const TestPage = () => {
     const [answers, setAnswers] = useState<any>({});
     const [testStatus, setTestStatus] = useState<string>('loading');
     const [testPoint, setTestPoint] = useState<number>(0);
-    const [username, setUsername] = useState<string>('');
     const [result, setResult] = useState<any>();
-
     const { user } = useAppSelector((state) => state.storage);
+
     const checkAnswer = () => {
-        Object.values(answers).forEach((answer: any) => {
-            if (answer.is_correct == 1) {
-                setTestPoint((state) => (state += 1));
-            }
-        });
+        apiAxios
+            .post('api/test/check-answers', {
+                answers,
+                test_id: testId,
+                user_id: user.isLogin ? user.id : null,
+            })
+            .then((res) => {
+                const result = res.data.result;
+                if (res.data.status === 'successful') {
+                    setTestPoint(result.point);
+                }
+            });
         setTestStatus('finish');
     };
 
@@ -76,16 +83,20 @@ const TestPage = () => {
         getUserByAccessToken().then((dataUser) => {
             apiAxios.get('api/test/' + testId + '?embeds=tasks.questions.answers').then((res) => {
                 if (res.data.status == 'successful') {
-                    if (!!dataUser || !res.data.result.required_login) {
+                    if (!!dataUser || res.data.result.required_login === 0) {
                         const testData = res.data.result;
                         setTest(testData);
+                        if (user.id === 0) {
+                            setTestStatus('start');
+                            return;
+                        }
                         apiAxios
                             .get(`api/result?filters=user_id=${user.id},test_id=${testData.id}`)
                             .then((response) => {
                                 if (response.data.status === 'successful') {
-                                    console.log(response.data.result[0]);
                                     if (response.data.result.length > 0) {
                                         const result = response.data.result[0];
+                                        setTestPoint(result.point);
                                         setResult(result);
                                         setAnswers(JSON.parse(result.meta_data));
                                         if (result.is_done == 1) {
@@ -119,7 +130,6 @@ const TestPage = () => {
     };
 
     const doTest = () => {
-        if (username === '' && !user.isLogin) return;
         setTestStatus('doing');
         if (!result && user.isLogin) {
             apiAxios
@@ -134,6 +144,11 @@ const TestPage = () => {
         }
     };
 
+    const doTestAgain = () => {
+        setTestStatus('start');
+        setAnswers([]);
+    };
+
     return (
         <MainLayout>
             <AppBar user={user} />
@@ -143,9 +158,7 @@ const TestPage = () => {
                         <CircularProgress />
                     </div>
                 )}
-                {testStatus === 'start' && (
-                    <Start username={username} setUsername={setUsername} user={user} doTest={doTest} />
-                )}
+                {testStatus === 'start' && <Start user={user} doTest={doTest} />}
                 {testStatus === 'doing' && (
                     <>
                         <div className={classes.title}>
@@ -164,13 +177,16 @@ const TestPage = () => {
                                 );
                             })}
                         </div>
+                        <TestInfo checkAnswer={checkAnswer} />
                     </>
                 )}
                 {testStatus === 'finish' && (
                     <div className={classes.finishContainer}>
                         <Typography variant="h4">Your scorce:</Typography>
                         <Typography variant="h3">{testPoint}</Typography>
-                        <Button onClick={() => setTestStatus('start')}>Again</Button>
+                        <Button onClick={doTestAgain} variant="outlined">
+                            Again
+                        </Button>
                     </div>
                 )}
             </Container>

@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const Bar = ({ user }: any) => {
+const Bar = ({ user, TestInfoComponent }: any) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);

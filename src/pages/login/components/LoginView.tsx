@@ -9,6 +9,7 @@ import {
     IconButton,
     OutlinedInput,
     Link,
+    Typography,
 } from '@material-ui/core';
 import { login } from '../../../services/service';
 import Visibility from '@material-ui/icons/Visibility';
@@ -70,16 +71,22 @@ const LoginView = () => {
     const [password, setPassword] = useState<string>('');
     const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
     const [loadingLogin, setLoadingLogin] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
     const dispatch = useAppDispatch();
     const history = useHistory();
     const loginHandle = () => {
         setLoadingLogin(true);
-        login(email, password).then((res: any) => {
-            if (res.status === 200) {
-                dispatch(setUser(res.data.user));
+        login(email, password)
+            .then((res: any) => {
+                if (res.status === 200) {
+                    dispatch(setUser(res.data.user));
+                    setLoadingLogin(false);
+                }
+            })
+            .catch((err) => {
+                setMessage('Wrong user name or password. Please try again!');
                 setLoadingLogin(false);
-            }
-        });
+            });
     };
 
     const handleClickShowPassword = () => {
@@ -122,6 +129,7 @@ const LoginView = () => {
                             </InputAdornment>
                         }
                     />
+                    <Typography color="error">{message}</Typography>
                 </form>
                 <div className={classes.footerAction}>
                     <div className={classes.wrapperButtonLogin}>

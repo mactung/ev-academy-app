@@ -5,7 +5,6 @@ import Cookies from 'universal-cookie';
 
 export const instance = (baseURL: string): AxiosInstance => {
     const cookies = new Cookies();
-    const token = cookies.get('access_token');
     const axiosInstance = axios.create({
         baseURL,
         paramsSerializer: (params) => qs.stringify(params),
@@ -14,6 +13,7 @@ export const instance = (baseURL: string): AxiosInstance => {
 
     axiosInstance.interceptors.request.use(
         function (config) {
+            const token = cookies.get('access_token');
             if (token) {
                 config.headers['Authorization'] = 'Bearer ' + token;
             }

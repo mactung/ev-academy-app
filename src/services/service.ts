@@ -27,8 +27,7 @@ export const login = async (email: string, password: string) => {
                 setHeaders({ Authorization: 'Bearer ' + res.data.access_token });
             }
             return res;
-        })
-        .catch((error) => console.log(error));
+        });
 };
 
 export const logout = async () => {

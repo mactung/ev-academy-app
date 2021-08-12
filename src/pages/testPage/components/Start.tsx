@@ -3,8 +3,6 @@ import { Button, TextField, Typography } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 interface IProps {
-    username: string;
-    setUsername: (value: string) => void;
     user: any;
     doTest: () => void;
 }
@@ -28,28 +26,11 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const Start = ({ username, setUsername, user, doTest }: IProps) => {
+const Start = ({ user, doTest }: IProps) => {
     const classes = useStyles();
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        event.persist();
-        setUsername((event.target as HTMLInputElement).value);
-    };
     return (
         <div className={classes.root}>
-            {user.isLogin ? (
-                <Typography>Welcome, {user.name}</Typography>
-            ) : (
-                <form className={classes.form} noValidate autoComplete="off">
-                    <TextField
-                        id="outlined-basic"
-                        label="Enter your name"
-                        value={username}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>): void => handleChange(e)}
-                        variant="outlined"
-                    />
-                </form>
-            )}
+            {user.isLogin && <Typography variant="h6">Welcome, {user.name}</Typography>}
             <div>
                 <Typography>Khi bắt đầu làm bài thời gian sẽ luôn được tính kể cả khi bạn thoát ra.</Typography>
             </div>
